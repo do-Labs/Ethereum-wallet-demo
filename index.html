@@ -1,0 +1,96 @@
+    <!doctype>
+    <html>
+    <head>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
+	<script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="   crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+    <script type="text/javascript">
+		$(function(){
+			$('.selectpicker').each(function(){
+				var _this = $(this);
+				$.each(web3.eth.accounts, function(i, val){
+					var name = (val == '0x758c74b2b65b546d90c20cfd681f2bea6a6a0861') ? 'SKAT' : 'user_'+i;
+					_this.append($('<option />').val(val).text(name));
+				});
+			});
+			
+			web3.eth.defaultAccount = web3.eth.accounts[0];
+
+			var abi = [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"type":"function"},{"constant":false,"inputs":[{"name":"value","type":"address"}],"name":"setSkat","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"skat","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[],"type":"function"},{"inputs":[{"name":"initialSupply","type":"uint256"},{"name":"tokenName","type":"string"},{"name":"decimalUnits","type":"uint8"},{"name":"tokenSymbol","type":"string"}],"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"}];
+			
+			var MyContract = web3.eth.contract(abi);
+			
+			var myContractInstance = MyContract.at('0xf025d81196b72fba60a1d4dddad12eeb8360d828');
+			
+			var sym = myContractInstance.symbol();
+			
+			var event = myContractInstance.Transfer({});
+			
+			event.watch(function(error, result){
+			  if (!error)
+				  $('.alert-info').append('<div class="row"><b>' + result.args.from + '</b> sent <label class="text text-primary">' + result.args.value + '</label> to <b>' + result.args.to + '</b>');
+			});
+			
+			$('#address0').on('change', function(){
+				myContractInstance.setSkat($(this).val());
+				$('#balance0').text(myContractInstance.balanceOf($(this).val()) + " " + sym);
+			});
+			
+
+			$('#address1').on('change', function(){
+				$('#balance1').text(myContractInstance.balanceOf($(this).val()) + " " + sym);
+			});
+			
+			$('.transfer').on('click', function(){
+				var amount = $('#amount').val();
+				var to = $('#address2').val();
+				var from = $('#address1').val();
+				myContractInstance.transfer(to, amount, {from: from}, function(error, result){
+					if (!error)
+					{
+						$('.alert-info').append('<div class="row"><b>' + from + '</b> sent <label class="text text-primary">' + amount + '</label> to <b>' + to + '</b>');
+						$('.selectpicker').trigger('change');
+					}
+				});
+			});
+		});
+    </script>
+    </head>
+    <body>
+		<div class="container">
+			<h1>Set SKAT account</h1>
+			<hr />
+			<div class="row">
+				Select account:
+				<select id="address0" class="selectpicker">
+				</select>
+				<label id="balance0"></label>
+			</div>
+			<div class="clearfix" style="padding-bottom: 40px;"></div>
+			<h1>Send transaction</h1>
+			<hr />
+			<div class="row">
+				Select account:
+				<select id="address1" class="selectpicker">
+				</select>
+				<label id="balance1"></label>
+			</div>
+			<div class="row">
+				Send:
+				<input id="amount" type="number" class="form-input" />
+				<br />
+				To: 
+				<select id="address2" class="selectpicker">
+				</select>
+				
+				<div class="btn btn-success transfer">Transfer</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12 alert alert-info">
+				</div>
+			</div>
+		</div>
+    </body>
+    </html>
