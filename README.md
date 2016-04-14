@@ -6,4 +6,5 @@
   - [Mix IDE] (https://github.com/ethereum/webthree-umbrella/releases/latest)
 
 #####Installation
-  1. Make sure Mix IDE is pointing at the workspace you are gonna work at.
+  1. Create new project with the Mix IDE.
+  2. Copy the files from repo into the new project folder and replace the old ones.
