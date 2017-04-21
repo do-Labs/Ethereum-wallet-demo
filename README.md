@@ -3,7 +3,7 @@
 #### Blockchain demo app built on ethereum platform
 
 ##### Requirements
-  - [Mix IDE] (https://github.com/ethereum/webthree-umbrella/releases/latest)
+  - [Mix IDE](https://github.com/ethereum/webthree-umbrella/releases/latest)
 
 ##### Installation
   1. Create new project with the Mix IDE.
